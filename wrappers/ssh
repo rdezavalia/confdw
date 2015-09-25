@@ -1,0 +1,15 @@
+#!/bin/bash
+
+export CONFDW_CONF="$HOME/.ssh/config"
+export CONFDW_DIR="$HOME/.ssh_conf.d"
+export CONFDW_APP='/usr/bin/ssh'
+export CONFDW_EXT='*.cfg'
+
+if [[ -x "$HOME/confdw/confdw" ]]; then
+    "$HOME/confdw/confdw" "$@"
+else
+    "$CONFDW_APP" "$@"
+fi
+
+exit 0
+

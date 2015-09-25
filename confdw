@@ -1,0 +1,54 @@
+#!/bin/bash
+
+#
+# TODO: describe
+#
+
+echoerr() {
+    cat <<< "$@" 1>&2
+}
+
+die() {
+    msg="$1"
+    echoerr "$msg"
+    exit 1
+}
+
+build_conf() {
+    filepath="$1"
+    confd="$2"
+    ext=${3:-"/ALL"}
+
+    if [[ $ext == "/ALL" ]]; then
+        find -L "$confd" -not -name .placeholder -type f | sort -n | xargs cat > "$filepath"
+    else
+        find -L "$confd" -not -name .placeholder -type f -iname "$ext" | sort -n | xargs cat > "$filepath"
+    fi
+}
+
+init_dir() {
+    placeholder="$1"
+    echo 'VERSION=1.0' > "$placeholder"
+}
+
+test -n "$CONFDW_CONF" || die 'ERROR: $CONFDW_CONF not setted'
+test -n "$CONFDW_DIR"  || die 'ERROR: $CONFDW_DIR not setted'
+test -n "$CONFDW_APP"  || die 'ERROR: $CONFDW_APP not setted'
+test -d "$CONFDW_DIR"  || die "ERROR: $CONFDW_DIR is not a directory"
+test -x "$CONFDW_APP"  || die "ERROR: $CONFDW_APP is not executable"
+test -d $(dirname "$CONFDW_CONF") || die "ERROR: directory missing, can't create $CONFDW_CONF file"
+
+PLACEHOLDER="$CONFDW_DIR/.placeholder"
+
+if [ ! -f "$PLACEHOLDER" ] && [ -f "$CONFDW_CONF" ]; then
+    die "ERROR: backup your config file and remove it [$CONFDW_CONF]"
+fi
+
+test -f "$PLACEHOLDER" && source "$PLACEHOLDER"
+
+build_conf "$CONFDW_CONF" "$CONFDW_DIR" "$CONFDW_EXT"
+test -f "$PLACEHOLDER" || init_dir "$PLACEHOLDER"
+
+"$CONFDW_APP" "$@"
+
+
