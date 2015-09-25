@@ -6,7 +6,7 @@ export CONFDW_APP='/usr/bin/ssh'
 export CONFDW_EXT='*.cfg'
 
 if [[ -x "$HOME/confdw/confdw" ]]; then
-    "$HOME/confdw/confdw" "$@"
+    "$HOME/bin/confdw/confdw" "$@"
 else
     "$CONFDW_APP" "$@"
 fi
